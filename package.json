@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "pages": "node scripts/build-pages.mjs"
   },
   "dependencies": {
     "next": "16.4.2",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4"
   }
 }
