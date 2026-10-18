@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const SIZES = '(min-width: 1600px) 1600px, 100vw';
 
@@ -11,6 +11,40 @@ function srcSet(page, ext) {
 export default function Viewer({ pages }) {
   const dialogRef = useRef(null);
   const [active, setActive] = useState(null);
+  const pageRefs = useRef([]);
+
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (dialogRef.current?.open) return;
+      const t = e.target;
+      if (t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+
+      e.preventDefault();
+      const els = pageRefs.current.filter(Boolean);
+      let current = 0;
+      els.forEach((el, i) => {
+        if (el.getBoundingClientRect().top <= 5) current = i;
+      });
+
+      let target = current;
+      if (e.key === 'ArrowRight') {
+        target = current + 1;
+      } else if (els[current].getBoundingClientRect().top < -5) {
+        target = current;
+      } else {
+        target = current - 1;
+      }
+      if (target < 0 || target >= els.length) return;
+
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      els[target].scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   function open(page) {
     if (!window.matchMedia('(max-width: 1023px)').matches) return;
@@ -29,6 +63,7 @@ export default function Viewer({ pages }) {
           return (
             <button
               key={page.id}
+              ref={(el) => (pageRefs.current[i] = el)}
               type="button"
               className="page"
               onClick={() => open(page)}
