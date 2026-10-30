@@ -1,7 +1,7 @@
 import pages from "@/data/pages.json";
 import Viewer from "./Viewer";
 
-const title = "Knit Capsule – Design Portfolio by Uthpala";
+const title = "Flow – Design Portfolio by Uthpala";
 
 export const metadata = {
   title,
